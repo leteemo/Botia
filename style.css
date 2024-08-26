@@ -1,0 +1,37 @@
+QWidget {
+    background-color: #f0f0f0;
+    border: 1px solid #d0d0d0;
+}
+
+QPushButton {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px;
+    padding-right: 100px;
+    padding-left: 100px;
+    border-radius: 5px;
+}
+
+#executionButton {
+    background-color: #fa6767;
+}
+
+QPushButton:hover {
+    background-color: #005fa3;
+}
+
+QPushButton:pressed {
+    background-color: #004080;
+}
+
+QWidget#button_widget {
+    background-color: #e0e0e0;
+    border: 1px solid #c0c0c0;
+    padding: 5px;
+}
+
+QVBoxLayout {
+    margin: 0;
+    padding: 0;
+}
