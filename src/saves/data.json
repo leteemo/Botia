@@ -1,0 +1,175 @@
+{
+    "Start": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move To Image",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": 15.20182446253716,
+            "y": 151.1929042082961
+        },
+        "type": "StartNode",
+        "identifier": "start"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Click Mouse",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "coor x": "4",
+            "coor y": "4"
+        },
+        "coord": {
+            "x": 846.6902515827765,
+            "y": 244.4077796751751
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
+    },
+    "Click Mouse": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "click": "right"
+        },
+        "coord": {
+            "x": 1309.3493139716668,
+            "y": 266.8092982075334
+        },
+        "type": "ClickMouseNode",
+        "identifier": "action"
+    },
+    "Move To Image": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "data": [
+                {
+                    "connected node": "AddArray2DNode 1",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "image src": "img/ex.png",
+            "precision": "0.7"
+        },
+        "coord": {
+            "x": 281.6985298818079,
+            "y": 222.46122646075145
+        },
+        "type": "GetImageCoordNode",
+        "identifier": "action"
+    },
+    "AddArray2DNode 1": {
+        "inputs": {
+            "data": "data",
+            "data2": "data2"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": 646.7272176204241,
+            "y": 397.81814508028276
+        },
+        "type": "AddArray2DNode",
+        "identifier": "data"
+    },
+    "Add float": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Array2DNode 1",
+                    "connected input": "data x"
+                }
+            ]
+        },
+        "widgets": {
+            "float": "100"
+        },
+        "coord": {
+            "x": -145.3611766882069,
+            "y": 390.66071983050597
+        },
+        "type": "FloatNode",
+        "identifier": "data"
+    },
+    "Array2DNode 1": {
+        "inputs": {
+            "data x": "data x",
+            "data y": "data y"
+        },
+        "outputs": {
+            "data 2D": [
+                {
+                    "connected node": "AddArray2DNode 1",
+                    "connected input": "data2"
+                }
+            ]
+        },
+        "widgets": {
+            "coor x": "100",
+            "coor y": "-100"
+        },
+        "coord": {
+            "x": 233.43874296702717,
+            "y": 473.3869623065341
+        },
+        "type": "Array2DNode",
+        "identifier": "data"
+    },
+    "Add float 1": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Array2DNode 1",
+                    "connected input": "data y"
+                }
+            ]
+        },
+        "widgets": {
+            "float": "-100"
+        },
+        "coord": {
+            "x": -155.5716417715493,
+            "y": 581.0957489079824
+        },
+        "type": "FloatNode",
+        "identifier": "data"
+    }
+}

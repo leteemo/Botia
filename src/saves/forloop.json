@@ -1,0 +1,136 @@
+{
+    "Start": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "For Loop",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": 88.4627191104806,
+            "y": 321.8728815362972
+        },
+        "type": "StartNode",
+        "identifier": "start"
+    },
+    "Delay": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Get Image Coord",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "delay": "5"
+        },
+        "coord": {
+            "x": 843.4438394724064,
+            "y": 323.80740541822365
+        },
+        "type": "DelayNode",
+        "identifier": "control"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Key",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "coor x": "1",
+            "coor y": "1"
+        },
+        "coord": {
+            "x": 1620.7747299511564,
+            "y": 311.7108637044874
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
+    },
+    "Get Image Coord": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "data": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "image src": "amixem.png",
+            "precision": "0.7"
+        },
+        "coord": {
+            "x": 1202.6303455746252,
+            "y": 312.588442996579
+        },
+        "type": "GetImageCoordNode",
+        "identifier": "action"
+    },
+    "For Loop": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Delay",
+                    "connected input": "input"
+                }
+            ],
+            "end_output": []
+        },
+        "widgets": {
+            "begin": "0",
+            "end": "5"
+        },
+        "coord": {
+            "x": 425.9235146641562,
+            "y": 325.39765211514657
+        },
+        "type": "ForLoopNode",
+        "identifier": "control"
+    },
+    "Key": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "key": "tab"
+        },
+        "coord": {
+            "x": 2036.4293214864451,
+            "y": 312.20701244334947
+        },
+        "type": "KeyNode",
+        "identifier": "action"
+    }
+}

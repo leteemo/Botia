@@ -1,0 +1,158 @@
+{
+"Start": {
+            "inputs": {},
+            "outputs": {
+                "output": [
+                    {
+                        "connected node": "For Loop",
+                        "connected input": "input"
+                    }
+                ]
+            },
+            "widgets": {},
+            "coord": {
+                "x": 100,
+                "y": 100
+            },
+            "type": "StartNode",
+            "identifier": "start"
+        },
+        "For Loop": {
+            "inputs": {
+                "input": "input"
+            },
+            "outputs": {
+                "output": [
+                    {
+                        "connected node": "Delay",
+                        "connected input": "input"
+                    }
+                ],
+                "end_output": [
+                    {
+                        "connected node": "Click Mouse",
+                        "connected input": "input"
+                    }
+                ]
+            },
+            "widgets": {
+                "begin": "0",
+                "end": "10"
+            },
+            "coord": {
+                "x": 200,
+                "y": 100
+            },
+            "type": "ForLoopNode",
+            "identifier": "control"
+        },
+        "Delay": {
+            "inputs": {
+                "input": "input"
+            },
+            "outputs": {
+                "output": [
+                    {
+                        "connected node": "Get Image Coord",
+                        "connected input": "input"
+                    }
+                ]
+            },
+            "widgets": {
+                "delay": "4"
+            },
+            "coord": {
+                "x": 400,
+                "y": 100
+            },
+            "type": "DelayNode",
+            "identifier": "control"
+        },
+        "Get Image Coord": {
+            "inputs": {
+                "input": "input"
+            },
+            "outputs": {
+                "output": [
+                    {
+                        "connected node": "Move Mouse",
+                        "connected input": "input"
+                    }
+                ],
+                "data": [
+                    {
+                        "connected node": "Move Mouse",
+                        "connected input": "data"
+                    }
+                ]
+            },
+            "widgets": {
+                "image src": "phone.png",
+                "precision": "0.8"
+            },
+            "coord": {
+                "x": 600,
+                "y": 100
+            },
+            "type": "GetImageCoordNode",
+            "identifier": "action"
+        },
+        "Move Mouse": {
+            "inputs": {
+                "input": "input",
+                "data": "data"
+            },
+            "outputs": {
+                "output": [
+                    {
+                        "connected node": "Key",
+                        "connected input": "input"
+                    }
+                ]
+            },
+            "widgets": {
+                "coor x": "1",
+                "coor y": "1"
+            },
+            "coord": {
+                "x": 800,
+                "y": 100
+            },
+            "type": "MoveMouseNode",
+            "identifier": "action"
+        },
+        "Key": {
+            "inputs": {
+                "input": "input"
+            },
+            "outputs": {
+                "output": []
+            },
+            "widgets": {
+                "key": "space"
+            },
+            "coord": {
+                "x": 1000,
+                "y": 100
+            },
+            "type": "KeyNode",
+            "identifier": "action"
+        },
+        "Click Mouse": {
+            "inputs": {
+                "input": "input"
+            },
+            "outputs": {
+                "output": []
+            },
+            "widgets": {
+                "click": "right"
+            },
+            "coord": {
+                "x": 1200,
+                "y": 100
+            },
+            "type": "ClickMouseNode",
+            "identifier": "action"
+        }
+    }

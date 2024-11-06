@@ -1,0 +1,169 @@
+{
+    "Start": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Get Cascade Data",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": 150.0,
+            "y": 150.0
+        },
+        "type": "StartNode",
+        "identifier": "start"
+    },
+    "Get Cascade Data": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "For Each Loop",
+                    "connected input": "input"
+                }
+            ],
+            "coords of detected": [
+                {
+                    "connected node": "For Each Loop",
+                    "connected input": "array"
+                }
+            ]
+        },
+        "widgets": {
+            "cascade file": "haarcascade_frontalface_default.xml",
+            "scale factor": "1.1",
+            "min neighboor": "10"
+        },
+        "coord": {
+            "x": 483.75848975435076,
+            "y": 153.38716125694833
+        },
+        "type": "GetCascadeDataNode",
+        "identifier": "control"
+    },
+    "For Each Loop": {
+        "inputs": {
+            "input": "input",
+            "array": "array"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "returned data": [
+                {
+                    "connected node": "get Copy",
+                    "connected input": "data"
+                },
+                {
+                    "connected node": "get Copy 1",
+                    "connected input": "data"
+                }
+            ],
+            "end_output": []
+        },
+        "widgets": {},
+        "coord": {
+            "x": 1044.4036451978975,
+            "y": 158.2673268536509
+        },
+        "type": "ForEachLoopNode",
+        "identifier": "control"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "coor x": "",
+            "coor y": ""
+        },
+        "coord": {
+            "x": 2131.7403517614694,
+            "y": 143.3379990936266
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
+    },
+    "get Copy": {
+        "inputs": {
+            "data": "data"
+        },
+        "outputs": {
+            "extracted data": [
+                {
+                    "connected node": "Array 2D",
+                    "connected input": "data x"
+                }
+            ]
+        },
+        "widgets": {
+            "index": "0"
+        },
+        "coord": {
+            "x": 1240.5766828640358,
+            "y": 342.23821385156094
+        },
+        "type": "GetCopyNode",
+        "identifier": "data"
+    },
+    "get Copy 1": {
+        "inputs": {
+            "data": "data"
+        },
+        "outputs": {
+            "extracted data": [
+                {
+                    "connected node": "Array 2D",
+                    "connected input": "data y"
+                }
+            ]
+        },
+        "widgets": {
+            "index": "1"
+        },
+        "coord": {
+            "x": 1252.7788335322648,
+            "y": 479.27775212551444
+        },
+        "type": "GetCopyNode",
+        "identifier": "data"
+    },
+    "Array 2D": {
+        "inputs": {
+            "data x": "data x",
+            "data y": "data y"
+        },
+        "outputs": {
+            "data 2D": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "coor x": "",
+            "coor y": ""
+        },
+        "coord": {
+            "x": 1708.3504415724203,
+            "y": 369.5453491552472
+        },
+        "type": "Array2DNode",
+        "identifier": "data"
+    }
+}

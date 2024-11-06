@@ -1,0 +1,77 @@
+/* Overall widget styling */
+QWidget {
+    background-color: #2c2c2c;
+    border: 1px solid #5c5959;
+}
+
+QWidget#api_widget {
+    min-width: 800px;
+    max-width: 400px;
+    border: 1px solid #333030;
+}
+
+/* Button styling */
+QPushButton {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Specific button styling */
+#executionButton {
+    background-color: #fa6767;
+}
+
+/* Button hover effect */
+QPushButton:hover {
+    background-color: #005fa3;
+}
+
+/* Button pressed effect */
+QPushButton:pressed {
+    background-color: #004080;
+}
+
+/* Styling for the widget that contains buttons */
+QWidget#button_widget {
+    background-color: #464646;
+    border: 1px solid #464646;
+    padding: 5px;
+    
+}
+
+#searchInput {
+    min-height: 30px;
+    color: white;
+}
+
+/* Styling for the search and buttons widget */
+QWidget#searchAndButtonsWidget {
+    min-width: 400px;
+    max-width: 400px;
+    border: 1px solid #333030;
+}
+
+/* Styling for the layout */
+QVBoxLayout {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style du QTreeWidget (fond, bordures) */
+QTreeWidget {
+    background-color: #333333;
+    border: 1px solid #5c5959;
+    color: white;
+    font-size: 14px;
+}
+
+/* Style pour les éléments parents */
+QTreeView::item:has-children {
+    font-weight: bold;
+    color: #0078d7; /* Couleur du texte des catégories principales */
+}
+
