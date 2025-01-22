@@ -42,8 +42,6 @@ class ForLoopNode(Node):
                 self.botManager.addNodeToQueue(self.get_output("end_output").connected_ports()[0].node())
 
 
-
-
     def setNodesBranch(self, nodes_end, branchedNode):
         for node in nodes_end:
             node.setBranching(branchedNode)

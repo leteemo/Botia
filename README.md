@@ -1,14 +1,9 @@
 # Botia
 
-Create a script to automate tasks using image recognition.
+This project allow to create script using image recognition and sharing it with api requests on a server.
 
-# Installation
+See the folder Server et Botia dor more details.
 
-git clone https://github.com/leteemo/Botia.git \
-cd Botia \
-python setup install \
-python src/botia.py
+## Installation of dependencies
 
-# Example of script
-
-![Texte alternatif de l'image](src/img/example.png)
+`pip install -r "requierements.txt`
