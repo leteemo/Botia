@@ -22,6 +22,8 @@ setup(
         'NodeGraphQt',
         'pyautogui',
         'opencv-python',
-        'bs4'
+        'bs4',
+        'matplotlib',
+        'mss'
     ],
 )

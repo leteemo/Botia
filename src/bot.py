@@ -1,7 +1,7 @@
 from PySide2.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QAction, QFileDialog, QMessageBox, QLineEdit, QTextEdit, QTreeWidget, QTreeWidgetItem
 from PySide2.QtGui import QKeyEvent
 from PySide2.QtCore import Qt
-
+from PySide2.QtWidgets import QDialog, QLabel
 from NodeGraphQt import NodeGraph, BaseNode
 
 from node.StartNode import StartNode
@@ -15,6 +15,7 @@ from node.ScrollNode import ScrollNode
 from node.BranchNode import BranchNode
 from node.ForLoopNode import ForLoopNode
 from node.ForEachLoopNode import ForEachLoopNode
+from node.GetObjectCoordNode import GetObjectCoordNode
 
 from node.GetCascadeDataNode import GetCascadeDataNode
 from node.data.FloatNode import FloatNode
@@ -31,8 +32,16 @@ import sys
 import time
 import requests
 
-from apikey import API_KEY
 from config import INIT_PROMPT
+import os
+
+from PySide2.QtWidgets import (
+    QDialog, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QWidget, QFormLayout
+)
+
+from PySide2.QtCore import QSettings
+
+
 
 
 
@@ -100,10 +109,45 @@ class MainWindow(QMainWindow):
         # Stocker les reponses des llm
         self.response_llm = ""
 
+        self.settings_window = None
+
+        self.config = ConfigManager()
+        settings = self.config.load()  # Renvoie dict avec defaults si vide
+
+        self.api_choice = settings.get("api_choice", "gpt")
+        self.model = settings.get("model", "")
+        self.url = settings.get("url", "")
+
+        
+
+    def save_and_close(self):
+        self.config.save(
+            self.api_choice.currentText(),
+            self.model_input.text(),
+            self.url_input.text()
+        )
+        self.close()
+
+    def openSettingsWindow(self):
+        self.settings_window = SettingsWindow(self)
+        self.settings_window.show()
+
+    def updateSettingsFromWindow(self):
+        if self.settings_window:
+            settings = self.settings_window.get_settings()
+            self.config.save(settings["api_choice"], settings["model"], settings["url"])
+            self.settings = settings
+            print("Settings mises à jour :", self.settings)
+
+    def openSettingsWindow(self):
+        if self.settings_window is None:
+            self.settings_window = SettingsWindow(self)
+        self.settings_window.show()
+
 
     # Enregistrement des nodes dans le graphe
     def _register_nodes(self):
-        nodes = [StartNode, MoveMouseNode, KeyNode, DelayNode, GetImageCoordNode, ClickMouseNode, ScrollNode, GetSearchedImageCoordNode,
+        nodes = [StartNode, MoveMouseNode, KeyNode, DelayNode, GetImageCoordNode, GetObjectCoordNode, ClickMouseNode, ScrollNode, GetSearchedImageCoordNode,
             BranchNode, ForLoopNode, ForEachLoopNode, GetCascadeDataNode, FloatNode, AddFloatNode, Array2DNode, AddArray2DNode, GetCopyNode]
         for node in nodes:
             self.graph.register_node(node)
@@ -135,44 +179,95 @@ class MainWindow(QMainWindow):
                     else:
                         button.setVisible(False)
 
-    def sendPrompt(self):
+    def sendPromptOpenAI(self):
 
-        url = "https://api.openai.com/v1/chat/completions"
+        url = self.url
+        api_key = os.getenv("OPENAI_API_KEY")
 
         # Créer les en-têtes de la requête
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {API_KEY}"
+            "Authorization": f"Bearer {api_key}"
         }
 
         # Créer le corps de la requête avec les paramètres nécessaires
         data = {
-            "model": "gpt-4o-mini",
+            "model": self.model,
             "messages": [
                 {"role": "system", "content": INIT_PROMPT},
                 {"role": "user", "content": self.generate_input.toPlainText()}
-            ],
-            "max_tokens": 2000  # Optionnel : Limite de tokens pour la réponse
+            ]
         }
 
         # Envoyer la requête POST à l'API
-        reponse = requests.post(url, headers=headers, data=json.dumps(data))
+        response = requests.post(url, headers=headers, data=json.dumps(data))
 
         # Vérifier si la requête a réussi
-        if reponse.status_code == 200:
+        if response.status_code == 200:
             # Extraire le texte de la réponse
-            completion = reponse.json()
+            completion = response.json()
             print(completion['choices'][0]['message']['content'])
             return completion['choices'][0]['message']['content']
         else:
             return None
 
 
+    def sendPromptOllama(self):
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        model = self.model
+        url = self.url
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": INIT_PROMPT},
+                {"role": "user", "content": self.generate_input.toPlainText()}
+            ],
+            "stream": False
+        }
+
+
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+        # Vérifier si la requête a réussi
+        if response.status_code == 200:
+            # Extraire le texte de la réponse
+            completion = response.json()
+            print(completion["choices"][0]["message"]["content"])
+            return completion["choices"][0]["message"]["content"]
+        else:
+            return None
+
+
     def createGraphWithLLM(self):
-        self.response_llm = self.sendPrompt()
+        if self.settings_window and self.settings_window.isVisible():
+            settings = self.settings_window.get_settings()
+            self.api_choice = settings["api_choice"]
+            self.model = settings["model"]
+            self.url = settings["url"]
+        else:
+            # Utiliser les settings déjà chargés au lancement
+            pass
+
+        if self.api_choice == "ollama":
+            self.response_llm = self.sendPromptOllama()
+        elif self.api_choice == "gpt":
+            self.response_llm = self.sendPromptOpenAI()
+        
         if self.response_llm:
             json_graph = json.loads(self.response_llm)["instructions"]
             self.loadFromJSON(json_graph)
+
+    def getSettingsFromWindow(self):
+        if hasattr(self, 'settings_window'):
+            return self.settings_window.get_settings()
+        else:
+            print("Settings window not open")
+            return None
 
 
 
@@ -196,7 +291,7 @@ class MainWindow(QMainWindow):
         self.ai_layout = QVBoxLayout()
         self.generate_input = QTextEdit()
         self.generate_input.setFixedHeight(100)
-        self.generate_input.setPlaceholderText("Generate...")
+        self.generate_input.setPlaceholderText("Ask to AI to generate a script...")
         self.generate_input.textChanged.connect(self.filter_buttons)
         self.generate_input.setObjectName("searchInput")
         self.ai_layout.addWidget(self.generate_input)
@@ -241,6 +336,7 @@ class MainWindow(QMainWindow):
             ("Add Key", lambda: self._create_node('action.KeyNode', 'Key', 500, 300), "Actions", False),
             ("Add Delay", lambda: self._create_node('control.DelayNode', 'Delay', 500, 300), "Controls", False),
             ("Add Get Image Coord", lambda: self._create_node('action.GetImageCoordNode', 'Get Image Coord', 500, 300), "Actions", False),
+            ("Add Get Object Coord", lambda: self._create_node('action.GetObjectCoordNode', 'Get Image Coord', 500, 300), "Actions", False),
             ("Add Search Image Coord", lambda: self._create_node('action.GetSearchedImageCoordNode', 'Search Image Coord', 500, 300), "Actions", False),
             ("Add Click Mouse", lambda: self._create_node('action.ClickMouseNode', 'Click Mouse', 500, 300), "Actions", False),
             ("Add Scroll", lambda: self._create_node('action.ScrollNode', 'Scroll', 500, 300), "Actions", False),
@@ -305,6 +401,12 @@ class MainWindow(QMainWindow):
         """)
         menu.addAction(QAction("Save as...", self, triggered=self.saveToJSON))
         menu.addAction(QAction("Load file", self, triggered=self.readFile))
+        
+        settings_menu = self.menuBar().addMenu("Settings")
+        action_settings = QAction("Open Settings", self)
+        action_settings.triggered.connect(self.openSettingsWindow)
+        settings_menu.addAction(action_settings)
+
 
     def firstExecution(self):
         BotManager.setQueue([])
@@ -427,6 +529,98 @@ class MainWindow(QMainWindow):
 
 
 
+class SettingsWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Settings")
+        self.resize(400, 250)
+
+        self.settings = QSettings("MonApp", "Botia")  # Nom organisation/app
+
+        layout = QVBoxLayout()
+        form_layout = QFormLayout()
+
+        self.api_choice = QComboBox()
+        self.api_choice.addItems(["gpt", "ollama"])
+        form_layout.addRow(QLabel("API Choice:"), self.api_choice)
+
+        self.model_input = QLineEdit()
+        self.model_input.setPlaceholderText("Enter model name")
+        form_layout.addRow(QLabel("Model:"), self.model_input)
+
+        self.url_input = QLineEdit()
+        self.url_input.setPlaceholderText("Enter URL")
+        form_layout.addRow(QLabel("URL:"), self.url_input)
+
+        layout.addLayout(form_layout)
+
+        close_btn = QPushButton("Save & Close")
+        close_btn.clicked.connect(self.save_and_close)
+        layout.addWidget(close_btn)
+
+        self.setLayout(layout)
+
+        # Charger les valeurs enregistrées au lancement
+        self.load_settings()
+
+        # Style pour texte blanc et fond sombre (optionnel)
+        self.setStyleSheet("""
+            QLabel, QLineEdit, QComboBox, QPushButton {
+                color: white;
+                background-color: #2b2b2b;
+            }
+            QLineEdit, QComboBox {
+                border: 1px solid #555;
+                padding: 4px;
+                border-radius: 3px;
+            }
+            QPushButton {
+                background-color: #444;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 3px;
+            }
+            QPushButton:hover {
+                background-color: #666;
+            }
+        """)
+
+    def load_settings(self):
+        self.api_choice.setCurrentText(self.settings.value("api_choice", "gpt"))
+        self.model_input.setText(self.settings.value("model", ""))
+        self.url_input.setText(self.settings.value("url", ""))
+
+    def save_settings(self):
+        self.settings.setValue("api_choice", self.api_choice.currentText())
+        self.settings.setValue("model", self.model_input.text())
+        self.settings.setValue("url", self.url_input.text())
+
+    def save_and_close(self):
+        self.save_settings()
+        self.close()
+
+    def get_settings(self):
+        return {
+            "api_choice": self.api_choice.currentText(),
+            "model": self.model_input.text(),
+            "url": self.url_input.text()
+        }
+
+class ConfigManager:
+    def __init__(self):
+        self.settings = QSettings("MonApp", "Botia")
+
+    def load(self):
+        return {
+            "api_choice": self.settings.value("api_choice", "gpt"),
+            "model": self.settings.value("model", ""),
+            "url": self.settings.value("url", "")
+        }
+
+    def save(self, api_choice, model, url):
+        self.settings.setValue("api_choice", api_choice)
+        self.settings.setValue("model", model)
+        self.settings.setValue("url", url)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

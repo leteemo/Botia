@@ -1,0 +1,67 @@
+{
+    "Start": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Get Image Coord",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": -78.13024133630543,
+            "y": 162.59930299251084
+        },
+        "type": "StartNode",
+        "identifier": "start"
+    },
+    "Get Image Coord": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "data": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "prompt": "Voiture"
+        },
+        "coord": {
+            "x": 216.56037522574866,
+            "y": 186.10645214550635
+        },
+        "type": "GetObjectCoordNode",
+        "identifier": "action"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "coor x": "",
+            "coor y": ""
+        },
+        "coord": {
+            "x": 617.7762824404424,
+            "y": 177.04673811162615
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
+    }
+}

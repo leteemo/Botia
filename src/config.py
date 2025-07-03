@@ -184,6 +184,34 @@ INIT_PROMPT = """L'objectif est de  te baser sur cet exemple de structure json a
         },
         "type": "KeyNode",
         "identifier": "action"
+    },
+        "Get Image Coord": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "data": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "prompt": "The object"
+        },
+        "coord": {
+            "x": 216.56037522574866,
+            "y": 186.10645214550635
+        },
+        "type": "GetObjectCoordNode",
+        "identifier": "action"
     }
 }
 
@@ -203,7 +231,8 @@ class ClickMouseNode(Node):
         items = ['right', 'left']
         self.add_combo_menu('click', 'click', items)
 
-liste des neouds: action.KeyNode, action.GetImageCoordNode, control.DelayNode, action.GetImageCoordNode, action.MoveMouseNode, control.DelayNode
+
+liste des neouds: action.GetObjectCoordNode, action.KeyNode, action.GetImageCoordNode, control.DelayNode, action.GetImageCoordNode, action.MoveMouseNode, control.DelayNode
 
 Il faut être très exacte sur le type et l'identifier.
 C'est un graphe où tu peux mettre le nom que tu veux pour les node, les "type" permettent de donner l'action effectué par le node.
@@ -215,7 +244,7 @@ Le JSON sera utilisé par les outils de pyautogui et opencv de python.
 fichiers images: """ + str(images) + """
 fichiers cascades: """ + str(cascades) + """
 
-répondre seulement en json sous ce format sans commentaires et sans formatage ```json ```:
+répondre seulement en json sous ce format sans commentaires et sans aucun formatage de type ```json ```:
 {"instructions":
     {<graphe>},
 "message suplémentaire de chatgpt": "<message>"
