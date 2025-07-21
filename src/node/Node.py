@@ -23,10 +23,14 @@ class Node(BaseNode):
 
         self.action()
 
+        # Ajout du node suivant à la queue
         if len(self.get_output("output").connected_ports()) > 0:
             self.botManager.addNodeToQueue(self.get_output("output").connected_ports()[0].node())
+            return
+
         elif self.branch != None:
             self.botManager.addNodeToQueue(self.branch)
+            return
 
     def getValue(self):
         pass

@@ -13,8 +13,6 @@ class AddArray2DNode(Node):
         self.add_input('data2')
         self.add_output('output')
 
-        self.value = None
-
     def getValue(self):
         val = [0, 0]
         self.get_input("data").connected_ports()[0].node().getValue()
@@ -27,5 +25,4 @@ class AddArray2DNode(Node):
         val[1] = value1[1] + value2[1]
 
         setattr(self.get_output("output"), 'data', val)
-    
 

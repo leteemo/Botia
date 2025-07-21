@@ -22,20 +22,48 @@
             "input": "input"
         },
         "outputs": {
-            "output": [],
-            "data": []
+            "output": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "coords of detected": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                }
+            ]
         },
         "widgets": {
-            "image file": "amixem.png",
             "cascade file": "haarcascade_frontalface_default.xml",
             "scale factor": "1.1",
             "min neighboor": "10"
         },
         "coord": {
-            "x": 508.4476427703121,
-            "y": 134.80165249167254
+            "x": 498.879604311598,
+            "y": 150.2086164859543
         },
         "type": "GetCascadeDataNode",
         "identifier": "control"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "coor x": "",
+            "coor y": ""
+        },
+        "coord": {
+            "x": 1086.6080954892225,
+            "y": 155.35690796156166
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
     }
 }

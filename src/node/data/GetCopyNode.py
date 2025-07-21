@@ -16,7 +16,10 @@ class GetCopyNode(Node):
 
 
     def getValue(self):
-        setattr(self.get_output("extracted data"), 'data', self.get_input("data").connected_ports()[0].data[int(self.get_property('index'))])
+        # Extrait un élément d'une liste
+        extracted_element = self.get_input("data").connected_ports()[0].data[int(self.get_property('index'))]
+        setattr(self.get_output("extracted data"), 'data', extracted_element)
+        return extracted_element
 
 
 

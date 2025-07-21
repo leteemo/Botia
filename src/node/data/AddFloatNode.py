@@ -23,6 +23,7 @@ class AddFloatNode(Node):
                 if(parent_node.getValue() != None and val != None):
                     val += parent_node.getValue()
 
+        setattr(self.get_output("output"), 'data', val)
         return val
     
 

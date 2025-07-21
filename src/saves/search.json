@@ -4,27 +4,27 @@
         "outputs": {
             "output": [
                 {
-                    "connected node": "Get Object Coord with Ai",
+                    "connected node": "Search Image Coord",
                     "connected input": "input"
                 }
             ]
         },
         "widgets": {},
         "coord": {
-            "x": 150.0,
-            "y": 150.0
+            "x": 98.34175284341458,
+            "y": 236.09707859430904
         },
         "type": "StartNode",
         "identifier": "start"
     },
-    "Get Object Coord with Ai": {
+    "Search Image Coord": {
         "inputs": {
             "input": "input"
         },
         "outputs": {
             "output": [
                 {
-                    "connected node": "Move Mouse",
+                    "connected node": "If",
                     "connected input": "input"
                 }
             ],
@@ -32,17 +32,22 @@
                 {
                     "connected node": "Move Mouse",
                     "connected input": "data"
+                },
+                {
+                    "connected node": "If",
+                    "connected input": "data"
                 }
             ]
         },
         "widgets": {
-            "prompt": "a car"
+            "object to search": "wikipedia",
+            "number of match": "5"
         },
         "coord": {
-            "x": 431.1223371245528,
-            "y": 167.98447948872624
+            "x": 349.6171027219402,
+            "y": 229.97437607662857
         },
-        "type": "GetAIObjectCoordNode",
+        "type": "GetImageFromSearch",
         "identifier": "action"
     },
     "Move Mouse": {
@@ -51,39 +56,41 @@
             "data": "data"
         },
         "outputs": {
-            "output": [
-                {
-                    "connected node": "Click Mouse",
-                    "connected input": "input"
-                }
-            ]
+            "output": []
         },
         "widgets": {
             "coor x": "",
             "coor y": ""
         },
         "coord": {
-            "x": 873.0873405753389,
-            "y": 179.46408996796737
+            "x": 973.7432663421444,
+            "y": 242.59519489174733
         },
         "type": "MoveMouseNode",
         "identifier": "action"
     },
-    "Click Mouse": {
+    "If": {
         "inputs": {
-            "input": "input"
+            "input": "input",
+            "data": "data"
         },
         "outputs": {
-            "output": []
+            "true": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "false": []
         },
         "widgets": {
-            "click": "right"
+            "boolean": "True"
         },
         "coord": {
-            "x": 1247.322642198602,
-            "y": 187.4998173034363
+            "x": 753.4292831093659,
+            "y": 152.6355650067761
         },
-        "type": "ClickMouseNode",
-        "identifier": "action"
+        "type": "IfNode",
+        "identifier": "control"
     }
 }

@@ -7,16 +7,18 @@ from NodeGraphQt import NodeGraph, BaseNode
 from node.StartNode import StartNode
 from node.MoveMouseNode import MoveMouseNode
 from node.KeyNode import KeyNode
+from node.TextNode import TextNode
 from node.DelayNode import DelayNode
 from node.GetImageCoordNode import GetImageCoordNode
 from node.ClickMouseNode import ClickMouseNode
 from node.ScrollNode import ScrollNode
 
+from node.data.EqualNode import EqualNode
 from node.BranchNode import BranchNode
 from node.ForLoopNode import ForLoopNode
 from node.ForEachLoopNode import ForEachLoopNode
-from node.GetObjectCoordNode import GetObjectCoordNode
-
+from node.GetAIObjectCoordNode import GetAIObjectCoordNode
+from node.IfNode import IfNode
 from node.GetCascadeDataNode import GetCascadeDataNode
 from node.data.FloatNode import FloatNode
 from node.data.AddFloatNode import AddFloatNode
@@ -24,7 +26,7 @@ from node.data.Array2DNode import Array2DNode
 from node.data.AddArray2DNode import AddArray2DNode
 from node.data.GetCopyNode import GetCopyNode
 
-from node.GetSearchedImageCoordNode import GetSearchedImageCoordNode
+from node.GetImageFromSearch import GetImageFromSearch
 
 import threading
 import json
@@ -40,8 +42,6 @@ from PySide2.QtWidgets import (
 )
 
 from PySide2.QtCore import QSettings
-
-
 
 
 
@@ -147,8 +147,8 @@ class MainWindow(QMainWindow):
 
     # Enregistrement des nodes dans le graphe
     def _register_nodes(self):
-        nodes = [StartNode, MoveMouseNode, KeyNode, DelayNode, GetImageCoordNode, GetObjectCoordNode, ClickMouseNode, ScrollNode, GetSearchedImageCoordNode,
-            BranchNode, ForLoopNode, ForEachLoopNode, GetCascadeDataNode, FloatNode, AddFloatNode, Array2DNode, AddArray2DNode, GetCopyNode]
+        nodes = [StartNode, MoveMouseNode, KeyNode, TextNode, DelayNode, GetImageCoordNode, GetAIObjectCoordNode, IfNode, ClickMouseNode, ScrollNode, GetImageFromSearch,
+            BranchNode, ForLoopNode, ForEachLoopNode, GetCascadeDataNode, FloatNode, EqualNode, AddFloatNode, Array2DNode, AddArray2DNode, GetCopyNode]
         for node in nodes:
             self.graph.register_node(node)
 
@@ -162,22 +162,45 @@ class MainWindow(QMainWindow):
     def filter_buttons(self):
         search_text = self.search_input.text().lower()
 
-        for text, button in self.button_map.items():
-            # Trouver le bouton correspondant dans self.buttons
-            button_info = next((btn for btn in self.buttons if btn[0].lower() == text), None)
-            
-            if button_info:
-                _, _, *style, visible = button_info
-                # Si le bouton doit être toujours visible, on le rend visible
-                if visible:
-                    button.setVisible(True)
+        for category, parent_item in self.tree_categories.items():
+            show_category = False  # On cache par défaut
 
+            for i in range(parent_item.childCount()):
+                child_item = parent_item.child(i)
+                button = self.tree_widget.itemWidget(child_item, 0)
+                button_text = button.text().lower()
+
+                # Trouver le bouton d’origine
+                button_info = next((btn for btn in self.buttons if btn[0].lower() == button_text), None)
+                always_visible = button_info[4] if button_info else False
+
+                # Afficher si texte vide ou correspondance
+                if always_visible or (search_text in button_text):
+                    button.setVisible(True)
+                    child_item.setHidden(False)  # Important : afficher l’item dans le QTree
+                    show_category = True
                 else:
-                    if len(search_text) > 0:
-                        # Sinon, le rendre visible si le texte de recherche correspond
-                        button.setVisible(search_text in text.lower())
-                    else:
-                        button.setVisible(False)
+                    button.setVisible(False)
+                    child_item.setHidden(True)  # Cacher l’item du QTree
+
+            # Cacher ou montrer la catégorie
+            parent_item.setHidden(not show_category)
+
+            # Gestion de l'expansion selon présence recherche
+            if show_category:
+                if search_text:
+                    self.tree_widget.expandItem(parent_item)
+                else:
+                    # Si pas de recherche, garder minimisé
+                    self.tree_widget.collapseItem(parent_item)
+            else:
+                self.tree_widget.collapseItem(parent_item)
+
+
+
+
+
+
 
     def sendPromptOpenAI(self):
 
@@ -217,6 +240,7 @@ class MainWindow(QMainWindow):
         api_key = os.getenv("OPENAI_API_KEY")
         model = self.model
         url = self.url
+        
 
         headers = {
             "Content-Type": "application/json"
@@ -244,11 +268,13 @@ class MainWindow(QMainWindow):
 
 
     def createGraphWithLLM(self):
+        
         if self.settings_window and self.settings_window.isVisible():
             settings = self.settings_window.get_settings()
             self.api_choice = settings["api_choice"]
             self.model = settings["model"]
             self.url = settings["url"]
+
         else:
             # Utiliser les settings déjà chargés au lancement
             pass
@@ -272,109 +298,124 @@ class MainWindow(QMainWindow):
 
 
     def _create_button_widget(self):
-
+        # Layout principal horizontal
         self.h_layout = QHBoxLayout()
-        self.interface_layout = QVBoxLayout()
-        self.main_layout.addLayout(self.interface_layout)
+        self.main_layout.addLayout(self.h_layout)
 
-        self.h_layout.addWidget(self.graph.widget)
-        self.interface_layout.addLayout(self.h_layout)
+        # À gauche, on met le graph.widget, qui prend tout l'espace possible
+        self.h_layout.addWidget(self.graph.widget, 1)  # 1 = stretch
 
-        # Crée le widget pour contenir le champ de recherche et les boutons
-        self.search_and_buttons_widget = QWidget()
-        self.search_and_buttons_layout = QVBoxLayout(self.search_and_buttons_widget)
-        self.h_layout.addWidget(self.search_and_buttons_widget)
-        self.search_and_buttons_widget.setObjectName("searchAndButtonsWidget")
+        # À droite, un widget contenant la zone recherche + boutons
+        self.right_widget = QWidget()
+        self.right_widget.setObjectName("searchAndButtonsWidget")
+        self.h_layout.addWidget(self.right_widget)
+        self.h_layout.setStretchFactor(self.right_widget, 0)
 
-        # Crée et configure le champ de prompt
-        buttonGenerate = QPushButton("Generate script")
-        self.ai_layout = QVBoxLayout()
-        self.generate_input = QTextEdit()
-        self.generate_input.setFixedHeight(100)
-        self.generate_input.setPlaceholderText("Ask to AI to generate a script...")
-        self.generate_input.textChanged.connect(self.filter_buttons)
-        self.generate_input.setObjectName("searchInput")
-        self.ai_layout.addWidget(self.generate_input)
-        self.ai_layout.addWidget(buttonGenerate)
-        self.interface_layout.addLayout(self.ai_layout)
-        buttonGenerate.clicked.connect(self.createGraphWithLLM)
+        # Layout vertical pour la zone droite
+        self.right_layout = QVBoxLayout(self.right_widget)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setSpacing(5)
 
-        # Crée et configure le champ de recherche
+        # Champ de recherche (en haut)
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Rechercher...")
         self.search_input.textChanged.connect(self.filter_buttons)
         self.search_input.setObjectName("searchInput")
-        self.search_and_buttons_layout.addWidget(self.search_input)
+        self.right_layout.addWidget(self.search_input)
 
-        # Crée un layout pour les boutons hors de l'arbre
+        # Boutons Execute / Stop (juste en dessous du champ recherche)
         self.top_buttons_layout = QHBoxLayout()
-        self.search_and_buttons_layout.addLayout(self.top_buttons_layout)
-
-        # Crée les boutons "execute" et "stop" en dehors de l'arbre
         self.execute_button = QPushButton("execute")
-        self.execute_button.setStyleSheet("background-color: rgb(0,255,0);")
+        self.execute_button.setStyleSheet("background-color: rgb(0,180,0);")
         self.execute_button.clicked.connect(self.firstExecution)
         self.top_buttons_layout.addWidget(self.execute_button)
 
         self.stop_button = QPushButton("stop")
-        self.stop_button.setStyleSheet("background-color: rgb(255,0,0);")
+        self.stop_button.setStyleSheet("background-color: rgb(180,0,0);")
         self.stop_button.clicked.connect(self.stopExecution)
         self.top_buttons_layout.addWidget(self.stop_button)
 
-        # Crée le QTreeWidget pour contenir les autres boutons dans une hiérarchie
+        self.right_layout.addLayout(self.top_buttons_layout)
+
+        # Tree widget pour les boutons, prend tout l'espace restant
         self.tree_widget = QTreeWidget()
-        self.tree_widget.setHeaderHidden(True)  # Cache l'en-tête du tree view
-        self.search_and_buttons_layout.addWidget(self.tree_widget)
+        self.tree_widget.setHeaderHidden(True)
+        self.right_layout.addWidget(self.tree_widget, 1)  # Stretch 1 = prend tout
 
-        # Ajoute un espace extensible en bas pour pousser les boutons vers le haut
-        self.search_and_buttons_layout.addStretch()
+        # Espace extensible entre tree_widget et prompt/bouton
+        # (pour pousser le prompt en bas)
+        # En fait on a déjà stretch 1 sur tree_widget, donc pas besoin de addStretch()
 
-        # Définit et ajoute les autres boutons à la mise en page sous des catégories dans l'arbre
+        # Zone prompt + bouton Generate (toujours en bas)
+        self.ai_widget = QWidget()
+        self.ai_layout = QVBoxLayout(self.ai_widget)
+        self.ai_layout.setContentsMargins(0, 0, 0, 0)
+        self.ai_layout.setSpacing(5)
+
+        self.generate_input = QTextEdit()
+        self.generate_input.setFixedHeight(200)
+        self.generate_input.setPlaceholderText("Ask to AI to generate a script...")
+        self.generate_input.textChanged.connect(self.filter_buttons)
+        self.generate_input.setObjectName("searchInput")
+        self.ai_layout.addWidget(self.generate_input)
+
+        buttonGenerate = QPushButton("Generate script")
+        buttonGenerate.clicked.connect(self.createGraphWithLLM)
+        self.ai_layout.addWidget(buttonGenerate)
+
+        self.right_layout.addWidget(self.ai_widget)
+
+        # --- Initialisation des boutons dans l'arbre ---
         self.buttons = [
-            # (nom du boutton, node invoqué, catégorie, visibilité)
-            ("Add Move Mouse", lambda: self._create_node('action.MoveMouseNode', 'Move Mouse', 500, 300), "Actions", False),
-            ("Add Key", lambda: self._create_node('action.KeyNode', 'Key', 500, 300), "Actions", False),
-            ("Add Delay", lambda: self._create_node('control.DelayNode', 'Delay', 500, 300), "Controls", False),
-            ("Add Get Image Coord", lambda: self._create_node('action.GetImageCoordNode', 'Get Image Coord', 500, 300), "Actions", False),
-            ("Add Get Object Coord", lambda: self._create_node('action.GetObjectCoordNode', 'Get Image Coord', 500, 300), "Actions", False),
-            ("Add Search Image Coord", lambda: self._create_node('action.GetSearchedImageCoordNode', 'Search Image Coord', 500, 300), "Actions", False),
-            ("Add Click Mouse", lambda: self._create_node('action.ClickMouseNode', 'Click Mouse', 500, 300), "Actions", False),
-            ("Add Scroll", lambda: self._create_node('action.ScrollNode', 'Scroll', 500, 300), "Actions", False),
-            ("Add Branch", lambda: self._create_node('control.BranchNode', 'Branch to Node', 500, 300).setGraph(self.graph), "Controls", False),
-            ("Add For Loop", lambda: self._create_node('control.ForLoopNode', 'For Loop', 500, 300), "Controls", False),
-            ("Add For Each Loop", lambda: self._create_node('control.ForEachLoopNode', 'For Each Loop', 500, 300), "Controls", False),
-            ("Add Get Cascade Data", lambda: self._create_node('control.GetCascadeDataNode', 'Get Cascade Data', 500, 300), "Controls", False),
-            ("Add Float", lambda: self._create_node('data.FloatNode', 'Add float', 500, 300), "Data", False),
-            ("Add Float addition", lambda: self._create_node('data.AddFloatNode', 'Float', 500, 300), "Data", False),
-            ("Add Array 2D", lambda: self._create_node('data.Array2DNode', 'Array 2D', 500, 300), "Data", False),
-            ("Add Array 2D Addition", lambda: self._create_node('data.AddArray2DNode', 'Array 2D addition', 500, 300), "Data", False),
-            ("Add Get Copy", lambda: self._create_node('data.GetCopyNode', 'get Copy', 500, 300), "Data", False)
+            # (nom, méthode, catégorie, style, visible)
+            ("Add Move Mouse", lambda: self._create_node('action.MoveMouseNode', 'Move Mouse', 500, 300), "Actions", "", False),
+            ("Add Key", lambda: self._create_node('action.KeyNode', 'Key', 500, 300), "Actions", "", False),
+            ("Add Text", lambda: self._create_node('action.TextNode', 'Key', 500, 300), "Actions", "", False),
+            ("Add Get Cascade Data", lambda: self._create_node('control.GetCascadeDataNode', 'Get Cascade Data', 500, 300), "Actions", "", False),
+            ("Add Delay", lambda: self._create_node('control.DelayNode', 'Delay', 500, 300), "Controls", "", False),
+            ("Add If", lambda: self._create_node('control.IfNode', 'If', 500, 300), "Controls", "", False),
+            ("Add Get Image Coord", lambda: self._create_node('action.GetImageCoordNode', 'Get Image Coord', 500, 300), "Actions", "", False),
+            ("Add Get Object Coord With AI", lambda: self._create_node('action.GetAIObjectCoordNode', 'Get Object Coord with Ai', 500, 300), "Actions", "", False),
+            ("Add Search Image Coord", lambda: self._create_node('action.GetImageFromSearch', 'Search Image Coord', 500, 300), "Actions", "", False),
+            ("Add Click Mouse", lambda: self._create_node('action.ClickMouseNode', 'Click Mouse', 500, 300), "Actions", "", False),
+            ("Add Scroll", lambda: self._create_node('action.ScrollNode', 'Scroll', 500, 300), "Actions", "", False),
+            ("Add Branch", lambda: self._create_node('control.BranchNode', 'Branch to Node', 500, 300).setGraph(self.graph), "Controls", "", False),
+            ("Add For Loop", lambda: self._create_node('control.ForLoopNode', 'For Loop', 500, 300), "Controls", "", False),
+            ("Add For Each Loop", lambda: self._create_node('control.ForEachLoopNode', 'For Each Loop', 500, 300), "Controls", "", False),
+            ("Add Equal", lambda: self._create_node('data.EqualNode', 'Equal', 500, 300), "Data", "", False),
+            ("Add Float", lambda: self._create_node('data.FloatNode', 'Float', 500, 300), "Data", "", False),
+            ("Add Float addition", lambda: self._create_node('data.AddFloatNode', 'Float Addition', 500, 300), "Data", "", False),
+            ("Add Array 2D", lambda: self._create_node('data.Array2DNode', 'Array 2D', 500, 300), "Data", "", False),
+            ("Add Array 2D Addition", lambda: self._create_node('data.AddArray2DNode', 'Array 2D addition', 500, 300), "Data", "", False),
+            ("Add Get Copy", lambda: self._create_node('data.GetCopyNode', 'get Copy', 500, 300), "Data", "", False)
         ]
 
-        # Dictionnaire pour garder la trace des catégories et des boutons
         self.tree_categories = {}
         self.button_map = {}
 
-        for text, method, category, *style, visible in self.buttons:
+        for text, method, category, style, visible in self.buttons:
             # Vérifie si la catégorie existe déjà, sinon la créer
             if category not in self.tree_categories:
                 parent_item = QTreeWidgetItem(self.tree_widget)
                 parent_item.setText(0, category)
                 self.tree_categories[category] = parent_item
+                
+                # Réduire la catégorie par défaut
+                self.tree_widget.collapseItem(parent_item)
             else:
                 parent_item = self.tree_categories[category]
 
             # Crée un bouton comme élément enfant
             button_item = QTreeWidgetItem(parent_item)
             button_widget = QPushButton(text)
-            if style:
-                button_widget.setStyleSheet(style[0])
+
             button_widget.clicked.connect(method)
             button_widget.setVisible(visible)  # Visibilité initiale
 
             # Ajoute le bouton à la map pour une gestion future
             self.tree_widget.setItemWidget(button_item, 0, button_widget)
             self.button_map[text.lower()] = button_widget
+
 
 
 

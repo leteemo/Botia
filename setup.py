@@ -24,6 +24,7 @@ setup(
         'opencv-python',
         'bs4',
         'matplotlib',
-        'mss'
+        'mss',
+        'scikit-learn'
     ],
 )

@@ -12,12 +12,12 @@ import pyautogui
 import json
 import mss
 
-class GetObjectCoordNode(Node):
+class GetAIObjectCoordNode(Node):
     __identifier__ = 'action'  # Identifiant du noeud
-    NODE_NAME = 'GetObjectCoordNode'       # Nom du noeud
+    NODE_NAME = 'GetAIObjectCoordNode'       # Nom du noeud
 
     def __init__(self):
-        super(GetObjectCoordNode, self).__init__()
+        super(GetAIObjectCoordNode, self).__init__()
 
         # Ajout de ports d'entrée et de sortie
         self.add_input('input', multi_input=True)
@@ -102,7 +102,7 @@ def capture_and_send_to_ai(prompt="",
     ax.set_xlim(0, width)
     ax.set_ylim(height, 0)
 
-    # ✅ Ajout des labels de case pour les axes X (colonnes) et Y (lignes)
+    # Ajout des labels de case pour les axes X (colonnes) et Y (lignes)
     cell_width = width / num_cells_x
     cell_height = height / num_cells_y
 
@@ -193,7 +193,6 @@ def capture_and_send_to_ai(prompt="",
                             num_cells_x=num_cells_x,
                             num_cells_y=num_cells_y)
 
-            pyautogui.moveTo(int(x), int(y), duration=1)
             return (int(x), int(y))
 
 

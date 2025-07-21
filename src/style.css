@@ -4,11 +4,7 @@ QWidget {
     border: 1px solid #5c5959;
 }
 
-QWidget#api_widget {
-    min-width: 800px;
-    max-width: 400px;
-    border: 1px solid #333030;
-}
+
 
 /* Button styling */
 QPushButton {

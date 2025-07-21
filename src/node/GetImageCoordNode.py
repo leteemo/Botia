@@ -23,6 +23,6 @@ class GetImageCoordNode(Node):
 
 
     def getValue(self):
-        self.value = pyautogui.locateCenterOnScreen("img/" + self.get_property('image src'),  confidence=float(self.get_property('precision')))
+        self.value = pyautogui.locateCenterOnScreen("images/" + self.get_property('image src'),  confidence=float(self.get_property('precision')))
         setattr(self.get_output("data"), 'data', self.value)
         

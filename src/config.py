@@ -24,7 +24,7 @@ def CHOICE_PROMPT(image_name):
 def IMAGES_NAMES(Authorization):
     files = []
     if Authorization:
-        dossier = 'img/'
+        dossier = 'images/'
         for fichier in os.listdir(dossier):
             chemin_complet = os.path.join(dossier, fichier)
             if os.path.isfile(chemin_complet):
@@ -46,200 +46,44 @@ images = IMAGES_NAMES(LLM_IMAGES_NAME_SENDING_AUTORISATION)
 cascades = CASCADES_NAMES(LLM_CASCADE_NAME_SENDING_AUTORISATION)
 
 
-INIT_PROMPT = """L'objectif est de  te baser sur cet exemple de structure json afin de me renvoyer des instructions:
 
-{
-    // node nommé Start
-    "Start": {
-        "inputs": {},
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "For Loop",
-                    "connected input": "input"
-                }
-            ]
-        },
-        "widgets": {},
-        "coord": {
-            "x": 88.4627191104806,
-            "y": 321.8728815362972
-        },
-        "type": "StartNode",
-        "identifier": "start"
-    },
-    // node nommé Delay
-    "Delay": {
-        "inputs": {
-            "input": "input"
-        },
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "Get Image Coord",
-                    "connected input": "input"
-                }
-            ]
-        },
-        "widgets": {
-            "delay": "5"
-        },
-        "coord": {
-            "x": 843.4438394724064,
-            "y": 323.80740541822365
-        },
-        "type": "DelayNode",
-        "identifier": "control"
-    },
-    "Move Mouse": {
-        "inputs": {
-            "input": "input",
-            "data": "data"
-        },
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "Key",
-                    "connected input": "input"
-                }
-            ]
-        },
-        "widgets": {
-            "coor x": "1",
-            "coor y": "1"
-        },
-        "coord": {
-            "x": 1620.7747299511564,
-            "y": 311.7108637044874
-        },
-        "type": "MoveMouseNode",
-        "identifier": "action"
-    },
-    "Get Image Coord": {
-        "inputs": {
-            "input": "input"
-        },
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "Move Mouse",
-                    "connected input": "input"
-                }
-            ],
-            "data": [
-                {
-                    "connected node": "Move Mouse",
-                    "connected input": "data"
-                }
-            ]
-        },
-        "widgets": {
-            "image src": "amixem.png",
-            "precision": "0.7"
-        },
-        "coord": {
-            "x": 1202.6303455746252,
-            "y": 312.588442996579
-        },
-        "type": "GetImageCoordNode",
-        "identifier": "action"
-    },
-    "For Loop": {
-        "inputs": {
-            "input": "input"
-        },
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "Delay",
-                    "connected input": "input"
-                }
-            ],
-            "end_output": []
-        },
-        "widgets": {
-            "begin": "0",
-            "end": "5"
-        },
-        "coord": {
-            "x": 425.9235146641562,
-            "y": 325.39765211514657
-        },
-        "type": "ForLoopNode",
-        "identifier": "control"
-    },
-    "Key": {
-        "inputs": {
-            "input": "input"
-        },
-        "outputs": {
-            "output": []
-        },
-        "widgets": {
-            "key": "tab"
-        },
-        "coord": {
-            "x": 2036.4293214864451,
-            "y": 312.20701244334947
-        },
-        "type": "KeyNode",
-        "identifier": "action"
-    },
-        "Get Image Coord": {
-        "inputs": {
-            "input": "input"
-        },
-        "outputs": {
-            "output": [
-                {
-                    "connected node": "Move Mouse",
-                    "connected input": "input"
-                }
-            ],
-            "data": [
-                {
-                    "connected node": "Move Mouse",
-                    "connected input": "data"
-                }
-            ]
-        },
-        "widgets": {
-            "prompt": "The object"
-        },
-        "coord": {
-            "x": 216.56037522574866,
-            "y": 186.10645214550635
-        },
-        "type": "GetObjectCoordNode",
-        "identifier": "action"
-    }
-}
+def get_exemples(dossier, fichiers=[]):
 
-C'est basé sur des classes python dont:
+    contenu_total = ""
 
-class ClickMouseNode(Node):
-    __identifier__ = 'action'  # Identifiant du noeud
-    NODE_NAME = 'ClickMouseNode'       # Nom du noeud
-
-    def __init__(self):
-        super(ClickMouseNode, self).__init__()
-
-        # Ajout de ports d'entrée et de sortie
-        self.add_input('input')
-        self.add_output('output')
-        
-        items = ['right', 'left']
-        self.add_combo_menu('click', 'click', items)
+    if len(fichiers) == 0:
+        fichiers = os.listdir(dossier)
 
 
-liste des neouds: action.GetObjectCoordNode, action.KeyNode, action.GetImageCoordNode, control.DelayNode, action.GetImageCoordNode, action.MoveMouseNode, control.DelayNode
+    for fichier in fichiers:
 
-Il faut être très exacte sur le type et l'identifier.
+        if fichier.endswith(".json"):
+            chemin_fichier = os.path.join(dossier, fichier)
+            with open(chemin_fichier, "r", encoding="utf-8") as f:
+                contenu_total += f.read() + "\n autre exemple: \n"
+
+    return contenu_total
+
+
+INIT_PROMPT = """L'objectif est de  te baser sur cet exemple de structure json afin de me renvoyer des instructions comme par exemple:
+
+""" + get_exemples("saves", fichiers=["ai.json", "cascadeloop.json", "click_firefox.json", "windows_click", "search.json"]) + """
+
+liste des neouds: action.GetAIObjectCoordNode, action.KeyNode, action.GetImageCoordNode, control.DelayNode, action.GetImageCoordNode, action.MoveMouseNode, control.DelayNode,
+action.GetImageFromSearch.
+
+GetImageFromSearch: cherche sur internet une image et la compare grâce au match de points d'interets, efficace pour les images 2D comme les icones, dessin 2D, photos récurentes etc...
+GetAIObjectCoordNode: utilise une ia multimodal pour analyser une image, efficace pour les objets 3D qui peuvent tourner sur 3 dimensions comme des objets du quotidien.
+GetImageCoordNode: Cherche image exacte avec un degré de différence.
+If: condition, pour par exemple vérifier que un node renvoie quelque chose, utilise le pour bien vérifier afin de ne pas faire crash.
+
+Il faut être très exacte sur le type et l'identifier, c'est à dire en fonction du __identifier__, il n'y a que action, control et data.
 C'est un graphe où tu peux mettre le nom que tu veux pour les node, les "type" permettent de donner l'action effectué par le node.
 coord permet de placer le node dans l'interface graphique.
 Le premier node devra être un Start.
 Un input ne peut être connecté qu'à un output.
 Le JSON sera utilisé par les outils de pyautogui et opencv de python.
+
 
 fichiers images: """ + str(images) + """
 fichiers cascades: """ + str(cascades) + """

@@ -24,7 +24,7 @@ class MoveMouseNode(Node):
 
     def action(self):
 
-        
+        # Défini les valeurs de x et y si elles sont renseignées
         if self.get_property('coor x') and self.get_property('coor y'):
             self.x = self.get_property('coor x')
             self.y = self.get_property('coor y')

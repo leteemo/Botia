@@ -55,7 +55,7 @@
         "outputs": {
             "output": [
                 {
-                    "connected node": "Move Mouse",
+                    "connected node": "If",
                     "connected input": "input"
                 }
             ],
@@ -66,6 +66,10 @@
                 },
                 {
                     "connected node": "get Copy 1",
+                    "connected input": "data"
+                },
+                {
+                    "connected node": "If",
                     "connected input": "data"
                 }
             ],
@@ -165,5 +169,29 @@
         },
         "type": "Array2DNode",
         "identifier": "data"
+    },
+    "If": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "true": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ],
+            "false": []
+        },
+        "widgets": {
+            "boolean": "True"
+        },
+        "coord": {
+            "x": 1538.9338714252278,
+            "y": 100.98551208867704
+        },
+        "type": "IfNode",
+        "identifier": "control"
     }
 }

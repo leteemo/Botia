@@ -16,5 +16,5 @@ class KeyNode(Node):
 
     def action(self):
         print("execution key")
-        pyautogui.typewrite(self.get_property('key'))
-
+        keys = self.get_property('key').split('+')
+        pyautogui.hotkey(*[k.strip() for k in keys])

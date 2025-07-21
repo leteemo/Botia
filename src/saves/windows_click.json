@@ -1,0 +1,192 @@
+{
+    "Start": {
+        "inputs": {},
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Get Cascade Data",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": -753.4001690481543,
+            "y": 264.6424424237153
+        },
+        "type": "StartNode",
+        "identifier": "start"
+    },
+    "If": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "true": [],
+            "false": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "boolean": "False"
+        },
+        "coord": {
+            "x": 500.6841870267467,
+            "y": 263.077578196603
+        },
+        "type": "IfNode",
+        "identifier": "control"
+    },
+    "Equal": {
+        "inputs": {
+            "data": "data",
+            "data2": "data2"
+        },
+        "outputs": {
+            "result": [
+                {
+                    "connected node": "If",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {},
+        "coord": {
+            "x": 302.5506997570514,
+            "y": 464.1584298531495
+        },
+        "type": "EqualNode",
+        "identifier": "data"
+    },
+    "Get Image Coord": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "If",
+                    "connected input": "input"
+                }
+            ],
+            "data": [
+                {
+                    "connected node": "Move Mouse",
+                    "connected input": "data"
+                },
+                {
+                    "connected node": "Equal",
+                    "connected input": "data"
+                }
+            ]
+        },
+        "widgets": {
+            "image src": "windows.png",
+            "precision": "0.7"
+        },
+        "coord": {
+            "x": -15.434510517929908,
+            "y": 242.6019476037942
+        },
+        "type": "GetImageCoordNode",
+        "identifier": "action"
+    },
+    "Get Cascade Data": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Get Image Coord",
+                    "connected input": "input"
+                }
+            ],
+            "coords of detected": [
+                {
+                    "connected node": "Equal",
+                    "connected input": "data2"
+                }
+            ]
+        },
+        "widgets": {
+            "cascade file": "haarcascade_frontalface_default.xml",
+            "scale factor": "1.1",
+            "min neighboor": "10"
+        },
+        "coord": {
+            "x": -489.5424233105912,
+            "y": 270.1530127539729
+        },
+        "type": "GetCascadeDataNode",
+        "identifier": "control"
+    },
+    "Click Mouse": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Key",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "click": "left"
+        },
+        "coord": {
+            "x": 1123.9563575211407,
+            "y": 360.6241551224165
+        },
+        "type": "ClickMouseNode",
+        "identifier": "action"
+    },
+    "Key": {
+        "inputs": {
+            "input": "input"
+        },
+        "outputs": {
+            "output": []
+        },
+        "widgets": {
+            "key": "Hi, here is an example of what I can do",
+            "interval": "0.05"
+        },
+        "coord": {
+            "x": 1383.2961315827743,
+            "y": 361.45602336541884
+        },
+        "type": "TextNode",
+        "identifier": "action"
+    },
+    "Move Mouse": {
+        "inputs": {
+            "input": "input",
+            "data": "data"
+        },
+        "outputs": {
+            "output": [
+                {
+                    "connected node": "Click Mouse",
+                    "connected input": "input"
+                }
+            ]
+        },
+        "widgets": {
+            "coor x": "",
+            "coor y": ""
+        },
+        "coord": {
+            "x": 762.6505122657795,
+            "y": 368.5809670916202
+        },
+        "type": "MoveMouseNode",
+        "identifier": "action"
+    }
+}
